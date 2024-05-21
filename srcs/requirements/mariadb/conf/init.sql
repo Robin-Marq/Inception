@@ -1,25 +1,19 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    Dockerfile                                         :+:      :+:    :+:    #
+#    init.sql                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: rmarquar <rmarquar@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/05/14 13:32:21 by rmarquar          #+#    #+#              #
-#    Updated: 2024/05/21 09:52:52 by rmarquar         ###   ########.fr        #
+#    Created: 2024/05/21 09:45:29 by rmarquar          #+#    #+#              #
+#    Updated: 2024/05/21 09:47:22 by rmarquar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM alpine:3.18
+USE mysql;
+CREATE DATABASE IF NOT EXISTS wordpress;
+CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'secret';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'%';
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'wordpress';
 
-RUN apk update && apk upgrade && apk add --no-cache nginx openssl
-
-COPY conf/nginx.conf /etc/nginx/nginx.conf
-COPY conf/default.conf /etc/nginx/conf.d/default.conf
-COPY index.html /usr/share/nginx/html/index.html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
-
-LABEL maintainer="Robin rmarquar@student.42heilbronn.de"
