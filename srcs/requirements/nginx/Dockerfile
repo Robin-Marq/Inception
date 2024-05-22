@@ -1,24 +1,17 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Dockerfile                                         :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: rmarquar <rmarquar@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/05/14 13:32:21 by rmarquar          #+#    #+#              #
-#    Updated: 2024/05/21 09:52:52 by rmarquar         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 FROM alpine:3.18
 
 RUN apk update && apk upgrade && apk add --no-cache nginx openssl
 
-COPY conf/nginx.conf /etc/nginx/nginx.conf
-COPY conf/default.conf /etc/nginx/conf.d/default.conf
-COPY index.html /usr/share/nginx/html/index.html
+# COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+COPY ./tools/index.html /usr/share/nginx/html/index.html
+
+COPY ./conf/ssl/rmarquar.42.fr.crt /etc/ssl/certs/nginx.crt
+COPY ./conf/ssl/rmarquar.42.fr.key /etc/ssl/private/nginx.key
+
+EXPOSE 443
+
 
 CMD ["nginx", "-g", "daemon off;"]
 
