@@ -1,12 +1,27 @@
 FROM alpine:3.18
 
-RUN apk update && apk --no-cache add mariadb mariadb-client
+ARG DB_PASS
+ARG DB_USER
+ARG DB_NAME
+ARG DB_ROOT
 
-RUN mkdir -p /var/log/mysql && chown -R mysql:mysql /var/log/mysql
+RUN apk update && apk add --no-cache mariadb mariadb-client
 
-COPY conf/my.cnf /etc/mysql/my.cnf
-COPY conf/init.sql /docker-entrypoint-initdb.d/init.sql
+RUN mkdir /var/run/mysqld; \
+    chmod -R 0777 /var/run/mysqld; \
+    { echo '[mysqld]'; \
+      echo 'skip-host-cache'; \
+      echo 'skip-name-resolve'; \
+      echo 'bind-address=0.0.0.0'; \
+    } | tee  /etc/my.cnf.d/docker.cnf; \
+    sed -i "s|skip-networking|skip-networking=0|g" \
+      /etc/my.cnf.d/mariadb-server.cnf
+
+RUN mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
 EXPOSE 3306
 
-CMD ["mysqld", "--user=mysql"]
+USER mysql
+COPY ./tools/entrypoint.sh .
+RUN sh entrypoint.sh
+CMD ["/usr/bin/mysqld", "--skip-log-error"]

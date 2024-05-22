@@ -1,5 +1,5 @@
 USE mysql;
-CREATE DATABASE IF NOT EXISTS wordpress;
+CREATE DATABASE wordpress IF NOT EXISTS ;
 CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'secret';
 GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'%';
 FLUSH PRIVILEGES;
